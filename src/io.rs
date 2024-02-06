@@ -1,12 +1,31 @@
-use text_io::read;
+// use text_io::read;
 use std::fs::read_to_string;
-use std::io::Result;
+use std::io::{Result,Write,stdout,stdin};
+
+// Asks for user input
+// pub fn get_input(message: &str) -> String {
+//     print!("{}", message);
+//     let word: String = read!();
+//     return word;
+// }
+
+fn trim_newline(s: &mut String) {
+    while s.ends_with('\n') || s.ends_with('\r') {
+        s.pop();
+    }
+}
 
 // Asks for user input
 pub fn get_input(message: &str) -> String {
-    println!("{}", message);
-    let word: String = read!();
-    return word;
+    // Display hint
+    print!("{}", message);
+    stdout().flush().unwrap();
+    // Read input into variable
+    let mut word = String::new();
+    stdin().read_line(&mut word).unwrap();
+    trim_newline(&mut word); // Remove trailing line
+    // Trim input before returning
+    return word.to_string();
 }
 
 // General display function

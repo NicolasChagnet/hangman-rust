@@ -83,7 +83,7 @@ pub fn get_init_word_from_file(filename: &str) -> String {
 }
 
 // We ask the user for input until a valid one is returned
-pub fn make_guess() -> char {
+fn make_guess() -> char {
     let mut letter: String;
     loop {
         letter = get_input("Pick a letter: ");
@@ -145,5 +145,14 @@ fn post_game(success: bool) {
         true => {
             io::show_message("Congratulation, you have found the word!");
         }
+    }
+}
+
+// Prompts the user to play again
+pub fn play_again() -> bool {
+    let choice = get_input("Play again? [y/N]: ");
+    match choice.as_str() {
+        "y" => true,
+        _ => false
     }
 }
