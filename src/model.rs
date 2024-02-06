@@ -54,7 +54,7 @@ impl Game {
     pub fn push_found(&mut self, c: char) {
         self.found.push(c);
     }
-
+    // Displays letters which have previously guessed
     pub fn display_guesses(&self) {
         let s: String = match self.guesses.len() {
             0 => "none".to_string(),
@@ -62,6 +62,7 @@ impl Game {
         };
         io::show_message(&format!("Previously tried letters: {}.", &s));
     }
+    // Displays a growing hangman growing with increasing errors
     pub fn display_hangman(&self) {
         let n = self.attempts as usize;
         match self.attempts {
