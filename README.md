@@ -4,6 +4,6 @@ This is a basic hangman game in Rust. To run it, clone this repository and build
 
 # TODO
 
-- Read words from file
-- Draw the hangman
-- Save gamescores
+- [x] Read words from file
+- [x] Draw the hangman
+- [ ] Save gamescores
