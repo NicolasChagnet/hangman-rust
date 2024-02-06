@@ -1,43 +1,54 @@
-use crate::{get_word, io};
+use crate::{get_input, io};
 use crate::model::Game;
 use regex::Regex;
 use std::process;
 use std::io::ErrorKind;
 use rand::seq::SliceRandom;
+use once_cell::sync::Lazy;
 
+const MAXTRYWORD: u32 = 3; // Maximum amount of wrong attempts a user can get
+const MAXGUESSES: u32 = 6; // Maximum guesses before the game ends
+
+// Check validity of word
+fn is_valid_word(s: &str) -> bool {
+    // The use of the Lazy module allows one to compile the regex only once at first use
+    static REWORD: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[a-z]+$").unwrap());
+    return REWORD.is_match(&s)
+}
+
+fn is_valid_letter(s: &str) -> bool {
+    // The use of the Lazy module allows one to compile the regex only once at first use
+    static RELETTER: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[a-z]$").unwrap());
+    return RELETTER.is_match(&s)
+}
+
+// Returns a word from use input
 pub fn get_init_word() -> String {
-    
     let mut counter: u32 = 0;
     let mut word: String;
-    const MAXTRY: u32 = 3;
-    let re_whole_word = Regex::new(r"^[a-z]+$").unwrap();
-
+    // Infinite loop, try again if the input is invalid, broken after a maximum amount of attempts or if the input is valid
     loop {
         counter += 1;
 
         word = match counter {
-            1 => io::get_word("Pick a word: "),
-            MAXTRY => {
+            1 => io::get_input("Pick a word: "),
+            MAXTRYWORD => {
                 io::show_error("Max. attempts reached. Restart the program to try again!");
                 process::exit(0);
             }
-            _ => io::get_word("Pick another word: ")
+            _ => io::get_input("Pick another word: ")
         };
-        
-        match re_whole_word.is_match(&word) {
+        // Check the validity of input
+        match is_valid_word(&word) {
             false => io::show_error("Enter a valid word (lowercase letters)!"),
             true => return word
         };
     }
 }
-
-fn is_valid_word(s: &str, re_whole_word: &Regex) -> bool {
-    return (!s.is_empty()) && (re_whole_word.is_match(&s))
-}
-
+// Get a random word from a list of words
 pub fn get_init_word_from_file(filename: &str) -> String {
     let word_str_ret = io::read_words_from_file(filename);
-    let re_whole_word = Regex::new(r"^[a-z]+$").unwrap();
+    // We try to inform the user about errors as much as possible
     match word_str_ret {
         Err(e) if e.kind() == ErrorKind::NotFound => {
             io::show_error("File not found!");
@@ -51,15 +62,17 @@ pub fn get_init_word_from_file(filename: &str) -> String {
             io::show_error("Some unknown error happened when attempting to open the file!");
             process::exit(0)
         }
+        // If a proper file was found, we parse it into words
         Ok(text) => {
             let text_split: Vec<&str> = text
                                         .split("\n")
-                                        .filter(|&s| is_valid_word(s, &re_whole_word))
+                                        .filter(|&s| is_valid_word(s)) // We filter out invalid words
                                         .collect();
             let mut rng = rand::thread_rng();
-            let chosen = text_split.choose(&mut rng);
+            let chosen = text_split.choose(&mut rng); // Choose a random valid word
             match chosen {
                 Some(w) => return String::from(*w),
+                // If the list of valid words is empty, we handle that error
                 None => {
                     io::show_error("No words found in file!");
                     process::exit(0)
@@ -69,12 +82,12 @@ pub fn get_init_word_from_file(filename: &str) -> String {
     }
 }
 
+// We ask the user for input until a valid one is returned
 pub fn make_guess() -> char {
-    let re_letter = Regex::new(r"^[a-z]$").unwrap();
     let mut letter: String;
     loop {
-        letter = get_word("Pick a letter: ");
-        match re_letter.is_match(&letter) {
+        letter = get_input("Pick a letter: ");
+        match is_valid_letter(&letter) {
             false => io::show_error("Enter a valid letter (lowercase)"),
             true  => {
                 let letter_chars: Vec<char> = letter.chars().collect();
@@ -84,38 +97,47 @@ pub fn make_guess() -> char {
     }
 }   
 
+// This function runs most of the game
 pub fn make_guesses(mut game: Game) {
-    const MAXGUESSES: u32 = 6;
     let mut guess: char;
     let mut counter: u32 = 1;
     let mut success = false;
+    // Loop until the player has won or lost
     while counter <= MAXGUESSES {
+        // Display status at every loop
         io::show_message(&format!("Attempt number {}", counter));
         game.display_guesses();
-        guess = make_guess();
+        // game.display_already_guessed();
+        guess = make_guess(); // Make the user guess a letter
         
+        // Check if that letter was already found/guessed
         if game.is_already_found(guess) {
             io::show_error("Already found this letter!");
             continue;
         }
-
         if game.is_already_guessed(guess) {
             io::show_error("Already guessed this letter!");
             continue;
         }
-        
+        // Check if the letter is a correct guess
         let is_found = game.add_guess(guess);
         if !is_found { 
             io::show_message("Too bad, this letter is not in the word!"); 
-            counter += 1;
+            counter += 1; // Increment if wrong (only if the input is valid)
         }
-
+        // Check if the end game condition has been fulfilled
         if game.is_finished() {
             success = true;
             game.display_guesses();
             break;
         }
     }
+    //Post-game
+    post_game(success);
+}
+
+// Handles post-game
+fn post_game(success: bool) {
     match success {
         false => {
             io::show_message("Too late, you died!");

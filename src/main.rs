@@ -12,11 +12,11 @@ struct Args {
 }
 
 fn main() {
-
+    // Load CLI arguments
     let args = Args::parse();
 
+    // Load word either from file, cli arg or user input
     let word: String;
-
     match args.file {
         Some(filename) => word = get_init_word_from_file(&filename),
         None => match args.word {
@@ -25,6 +25,8 @@ fn main() {
         }
     }
 
+    // Initialize a game struct
     let game = Game::new(word);
+    // Start the guessing on the game
     make_guesses(game);
 }
