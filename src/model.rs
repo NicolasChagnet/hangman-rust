@@ -1,5 +1,6 @@
 use std::fmt;
 use crate::io;
+use crate::service::MAXGUESSES;
 
 // Game struct containing all relevant info on a given guessing game
 pub struct Game {
@@ -38,6 +39,10 @@ impl Game {
         return self.word_chars.contains(&c);
     }
 
+    pub fn get_attempts(&self) -> u32 {
+        return self.attempts;
+    }
+
     pub fn increase_attempts(&mut self) {
         self.attempts += 1;
     }
@@ -56,6 +61,15 @@ impl Game {
             _ => self.guesses.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",") // Join vec of chars
         };
         io::show_message(&format!("Previously tried letters: {}.", &s));
+    }
+    pub fn display_hangman(&self) {
+        let n = self.attempts as usize;
+        match self.attempts {
+            1..=MAXGUESSES => {
+                io::show_message(crate::ascii::ASCII_HANGMAN[n - 1])
+            },
+            _ => ()
+        }
     }
     // Informative piece displaying the status and guesses
     pub fn display_mask(&self) {

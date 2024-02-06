@@ -7,7 +7,7 @@ use rand::seq::SliceRandom;
 use once_cell::sync::Lazy;
 
 const MAXTRYWORD: u32 = 3; // Maximum amount of wrong attempts a user can get
-const MAXGUESSES: u32 = 6; // Maximum guesses before the game ends
+pub const MAXGUESSES: u32 = crate::ascii::ASCII_HANGMAN.len() as u32; // Maximum guesses before the game ends
 
 // Check validity of word
 fn is_valid_word(s: &str) -> bool {
@@ -100,12 +100,13 @@ fn make_guess() -> char {
 // This function runs most of the game
 pub fn make_guesses(mut game: Game) {
     let mut guess: char;
-    let mut counter: u32 = 1;
+    // let mut counter: u32 = 1;
     let mut success = false;
     // Loop until the player has won or lost
-    while counter <= MAXGUESSES {
+    // while counter <= MAXGUESSES {
+    while game.get_attempts() < MAXGUESSES { // Max 7
         // Display status at every loop
-        io::show_message(&format!("Attempt number {}", counter));
+        io::show_message(&format!("Attempt number {}", game.get_attempts()));
         game.display_mask();
         game.display_guesses();
         guess = make_guess(); // Make the user guess a letter
@@ -123,8 +124,10 @@ pub fn make_guesses(mut game: Game) {
         let is_found = game.add_guess(guess);
         if !is_found { 
             io::show_message("Too bad, this letter is not in the word!"); 
-            counter += 1; // Increment if wrong (only if the input is valid)
+            game.increase_attempts(); // Increment if wrong (only if the input is valid)
         }
+
+        game.display_hangman(); // Show the growing hangman
         // Check if the end game condition has been fulfilled
         if game.is_finished() {
             success = true;
