@@ -1,8 +1,8 @@
 use crate::{get_word, io};
-use crate::model::Word;
+use crate::model::Game;
 use regex::Regex;
 
-pub fn get_init_word() -> Word {
+pub fn get_init_word() -> Game {
     
     let mut counter: u32 = 0;
     let mut word: String;
@@ -23,7 +23,7 @@ pub fn get_init_word() -> Word {
         
         match re.is_match(&word) {
             false => io::show_error("Enter a valid word (lowercase letters)!"),
-            true => return Word::new(word)
+            true => return Game::new(word)
         };
     }
 }
@@ -43,35 +43,35 @@ pub fn make_guess() -> char {
     }
 }   
 
-pub fn make_guesses(mut word: Word) {
+pub fn make_guesses(mut game: Game) {
     const MAXGUESSES: u32 = 10;
     let mut guess: char;
     let mut counter: u32 = 1;
     let mut success = false;
     while counter <= MAXGUESSES {
         io::show_message(&format!("Attempt number {}", counter));
-        word.display_guesses();
+        game.display_guesses();
         guess = make_guess();
         
-        if word.is_already_found(&guess) {
+        if game.is_already_found(guess) {
             io::show_error("Already found this letter!");
             continue;
         }
 
-        if word.is_already_guessed(&guess) {
+        if game.is_already_guessed(guess) {
             io::show_error("Already guessed this letter!");
             continue;
         }
         
-        let is_found = word.add_guess(guess);
+        let is_found = game.add_guess(guess);
         if !is_found { 
             io::show_message("Too bad, this letter is not in the word!"); 
             counter += 1;
         }
 
-        if word.is_finished() {
+        if game.is_finished() {
             success = true;
-            word.display_guesses();
+            game.display_guesses();
             break;
         }
     }

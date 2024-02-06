@@ -1,6 +1,6 @@
 use std::fmt;
 use crate::io;
-pub struct Word {
+pub struct Game {
     word: String,
     word_chars: Vec<char>,
     guesses: Vec<char>,
@@ -9,11 +9,11 @@ pub struct Word {
     attempts: u32
 }
 
-impl Word {
-    pub fn new(word_in: String) -> Word {
+impl Game {
+    pub fn new(word_in: String) -> Game {
         let len = word_in.len();
         let chars_l: Vec<char> = word_in.chars().collect();
-        Word {
+        Game {
             word: word_in,
             word_chars: chars_l,
             guesses: Vec::new(),
@@ -23,16 +23,16 @@ impl Word {
         }
     }
 
-    pub fn is_already_guessed(&self, c: &char) -> bool {
-        return self.guesses.contains(c);
+    pub fn is_already_guessed(&self, c: char) -> bool {
+        return self.guesses.contains(&c);
     }
 
-    pub fn is_already_found(&self, c: &char) -> bool {
-        return self.found.contains(c);
+    pub fn is_already_found(&self, c: char) -> bool {
+        return self.found.contains(&c);
     }
 
-    pub fn is_in_word(&self, c: &char) -> bool {
-        return self.word_chars.contains(c);
+    pub fn is_in_word(&self, c: char) -> bool {
+        return self.word_chars.contains(&c);
     }
 
     pub fn increase_attempts(&mut self) {
@@ -61,7 +61,7 @@ impl Word {
     pub fn add_guess(&mut self, c: char) -> bool {
         self.guesses.push(c);
 
-        if self.is_in_word(&c) {
+        if self.is_in_word(c) {
             self.found.push(c);
             for (i, ch) in self.word_chars.iter().enumerate() {
                 if c == *ch {
@@ -79,7 +79,7 @@ impl Word {
     }
 }
 
-impl fmt::Display for Word {
+impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let display_guesses: String = self.guesses.iter().collect();
         write!(f, "The chosen word is {} and the guessed letters are {}.\n {} attempts have been made.", self.word, display_guesses, self.attempts)
