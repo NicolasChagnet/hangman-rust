@@ -49,8 +49,16 @@ impl Game {
     pub fn push_found(&mut self, c: char) {
         self.found.push(c);
     }
-    // Informative piece displaying the status and guesses
+
     pub fn display_guesses(&self) {
+        let s: String = match self.guesses.len() {
+            0 => "none".to_string(),
+            _ => self.guesses.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",") // Join vec of chars
+        };
+        io::show_message(&format!("Previously tried letters: {}.", &s));
+    }
+    // Informative piece displaying the status and guesses
+    pub fn display_mask(&self) {
         let mut return_string = String::new();
         for c in self.masked_word.iter() {
             match *c {

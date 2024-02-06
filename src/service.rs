@@ -106,8 +106,8 @@ pub fn make_guesses(mut game: Game) {
     while counter <= MAXGUESSES {
         // Display status at every loop
         io::show_message(&format!("Attempt number {}", counter));
+        game.display_mask();
         game.display_guesses();
-        // game.display_already_guessed();
         guess = make_guess(); // Make the user guess a letter
         
         // Check if that letter was already found/guessed
@@ -128,7 +128,7 @@ pub fn make_guesses(mut game: Game) {
         // Check if the end game condition has been fulfilled
         if game.is_finished() {
             success = true;
-            game.display_guesses();
+            game.display_mask();
             break;
         }
     }
