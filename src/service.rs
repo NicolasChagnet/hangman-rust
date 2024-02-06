@@ -104,9 +104,9 @@ pub fn make_guesses(mut game: Game) {
     let mut success = false;
     // Loop until the player has won or lost
     // while counter <= MAXGUESSES {
-    while game.get_attempts() < MAXGUESSES { // Max 7
+    while game.get_errors() < MAXGUESSES { // Max 7
         // Display status at every loop
-        io::show_message(&format!("Attempt number {}", game.get_attempts()));
+        io::show_message(&format!("Errors made: {}", game.get_errors()));
         game.display_mask();
         game.display_guesses();
         guess = make_guess(); // Make the user guess a letter
@@ -136,14 +136,14 @@ pub fn make_guesses(mut game: Game) {
         }
     }
     //Post-game
-    post_game(success);
+    post_game(game.get_word(), success);
 }
 
 // Handles post-game
-fn post_game(success: bool) {
+fn post_game(word: &str, success: bool) {
     match success {
         false => {
-            io::show_message("Too late, you died!");
+            io::show_message(&format!("Too late, you died! The word was {}", word));
         },
         true => {
             io::show_message("Congratulation, you have found the word!");
@@ -159,3 +159,4 @@ pub fn play_again() -> bool {
         _ => false
     }
 }
+

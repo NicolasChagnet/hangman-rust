@@ -9,7 +9,7 @@ pub struct Game {
     guesses: Vec<char>, // letters already guessed by player
     found: Vec<char>, // correct letters found by player
     masked_word: Vec<Option<char>>, // Mask of letters found by players, with matching position
-    attempts: u32 // Record of number of (wrong) guesses
+    errors: u32 // Record of number of (wrong) guesses
 }
 
 // Various functions used to read/update the status of the game
@@ -23,10 +23,12 @@ impl Game {
             guesses: Vec::new(),
             found: Vec::new(),
             masked_word: vec![None; len],
-            attempts: 0
+            errors: 0
         }
     }
-
+    pub fn get_word(&self) -> &str {
+        return &self.word;
+    }
     pub fn is_already_guessed(&self, c: char) -> bool {
         return self.guesses.contains(&c);
     }
@@ -39,12 +41,12 @@ impl Game {
         return self.word_chars.contains(&c);
     }
 
-    pub fn get_attempts(&self) -> u32 {
-        return self.attempts;
+    pub fn get_errors(&self) -> u32 {
+        return self.errors;
     }
 
     pub fn increase_attempts(&mut self) {
-        self.attempts += 1;
+        self.errors += 1;
     }
 
     pub fn push_guess(&mut self, c: char) {
@@ -64,8 +66,8 @@ impl Game {
     }
     // Displays a growing hangman growing with increasing errors
     pub fn display_hangman(&self) {
-        let n = self.attempts as usize;
-        match self.attempts {
+        let n = self.errors as usize;
+        match self.errors {
             1..=MAXGUESSES => {
                 io::show_message(crate::ascii::ASCII_HANGMAN[n - 1])
             },
@@ -114,6 +116,6 @@ impl Game {
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let display_guesses: String = self.guesses.iter().collect();
-        write!(f, "The chosen word is {} and the guessed letters are {}.\n {} attempts have been made.", self.word, display_guesses, self.attempts)
+        write!(f, "The chosen word is {} and the guessed letters are {}.\n {} attempts have been made.", self.word, display_guesses, self.errors)
     }
 }
