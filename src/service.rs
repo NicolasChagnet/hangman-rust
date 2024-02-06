@@ -40,7 +40,7 @@ pub fn get_init_word() -> String {
         };
         // Check the validity of input
         match is_valid_word(&word) {
-            false => io::show_error("Enter a valid word (lowercase letters)!"),
+            false => io::show_error("Enter a valid word!"),
             true => return word
         };
     }
@@ -88,7 +88,7 @@ fn make_guess() -> char {
     loop {
         letter = get_input("Pick a letter: ");
         match is_valid_letter(&letter) {
-            false => io::show_error("Enter a valid letter (lowercase)"),
+            false => io::show_error("Please enter a valid letter."),
             true  => {
                 let letter_chars: Vec<char> = letter.chars().collect();
                 return letter_chars[0];

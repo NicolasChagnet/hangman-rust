@@ -25,7 +25,7 @@ pub fn get_input(message: &str) -> String {
     stdin().read_line(&mut word).unwrap();
     trim_newline(&mut word); // Remove trailing line
     // Trim input before returning
-    return word.to_string();
+    return word.to_lowercase();
 }
 
 // General display function
