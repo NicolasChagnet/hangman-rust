@@ -27,22 +27,22 @@ impl Game {
         }
     }
     pub fn get_word(&self) -> &str {
-        return &self.word;
+        &self.word
     }
     pub fn is_already_guessed(&self, c: char) -> bool {
-        return self.guesses.contains(&c);
+        self.guesses.contains(&c)
     }
 
     pub fn is_already_found(&self, c: char) -> bool {
-        return self.found.contains(&c);
+        self.found.contains(&c)
     }
 
     pub fn is_in_word(&self, c: char) -> bool {
-        return self.word_chars.contains(&c);
+        self.word_chars.contains(&c)
     }
 
     pub fn get_errors(&self) -> u32 {
-        return self.errors;
+        self.errors
     }
 
     pub fn increase_attempts(&mut self) {
@@ -101,14 +101,13 @@ impl Game {
                 }
             }
             return true;
-        } else {
-            return false;
         }
+        false
     }
 
     // Check if the word has been fully found
     pub fn is_finished(&self) -> bool {
-        return !(self.masked_word.contains(&None));
+        !(self.masked_word.contains(&None))
     }
 }
 

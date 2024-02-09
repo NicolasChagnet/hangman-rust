@@ -13,13 +13,13 @@ pub const MAXGUESSES: u32 = crate::ascii::ASCII_HANGMAN.len() as u32; // Maximum
 fn is_valid_word(s: &str) -> bool {
     // The use of the Lazy module allows one to compile the regex only once at first use
     static REWORD: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[a-z]+$").unwrap());
-    return REWORD.is_match(&s)
+    REWORD.is_match(&s)
 }
 
 fn is_valid_letter(s: &str) -> bool {
     // The use of the Lazy module allows one to compile the regex only once at first use
     static RELETTER: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[a-z]$").unwrap());
-    return RELETTER.is_match(&s)
+    RELETTER.is_match(&s)
 }
 
 // Returns a word from use input
@@ -34,13 +34,13 @@ pub fn get_init_word() -> String {
             1 => io::get_input("Pick a word: "),
             MAXTRYWORD => {
                 io::show_error("Max. attempts reached. Restart the program to try again!");
-                process::exit(0);
+                process::exit(1);
             }
             _ => io::get_input("Pick another word: ")
         };
         // Check the validity of input
         match is_valid_word(&word) {
-            false => io::show_error("Enter a valid word!"),
+            false => io::show_message("Enter a valid word!"),
             true => return word
         };
     }
@@ -52,15 +52,15 @@ pub fn get_init_word_from_file(filename: &str) -> String {
     match word_str_ret {
         Err(e) if e.kind() == ErrorKind::NotFound => {
             io::show_error("File not found!");
-            process::exit(0)
+            process::exit(1)
         },
         Err(e) if e.kind() == ErrorKind::PermissionDenied => {
             io::show_error("Permission denied when attempting to open the file!");
-            process::exit(0)
+            process::exit(1)
         },
         Err(_) => {
             io::show_error("Some unknown error happened when attempting to open the file!");
-            process::exit(0)
+            process::exit(1)
         }
         // If a proper file was found, we parse it into words
         Ok(text) => {
@@ -71,11 +71,11 @@ pub fn get_init_word_from_file(filename: &str) -> String {
             let mut rng = rand::thread_rng();
             let chosen = text_split.choose(&mut rng); // Choose a random valid word
             match chosen {
-                Some(w) => return String::from(*w),
+                Some(w) => String::from(*w),
                 // If the list of valid words is empty, we handle that error
                 None => {
                     io::show_error("No words found in file!");
-                    process::exit(0)
+                    process::exit(1)
                 }
             }
         }
@@ -88,14 +88,14 @@ fn make_guess() -> char {
     loop {
         letter = get_input("Pick a letter: ");
         match is_valid_letter(&letter) {
-            false => io::show_error("Please enter a valid letter."),
+            false => io::show_message("Please enter a valid letter."),
             true  => {
                 let letter_chars: Vec<char> = letter.chars().collect();
                 return letter_chars[0];
             }
         }
     }
-}   
+}
 
 // This function runs most of the game
 pub fn make_guesses(mut game: Game) {
@@ -113,11 +113,11 @@ pub fn make_guesses(mut game: Game) {
         
         // Check if that letter was already found/guessed
         if game.is_already_found(guess) {
-            io::show_error("Already found this letter!");
+            io::show_message("Already found this letter!");
             continue;
         }
         if game.is_already_guessed(guess) {
-            io::show_error("Already guessed this letter!");
+            io::show_message("Already guessed this letter!");
             continue;
         }
         // Check if the letter is a correct guess
@@ -160,3 +160,24 @@ pub fn play_again() -> bool {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_is_valid_word() {
+        assert_eq!(is_valid_word("foo"), true);
+        assert_eq!(is_valid_word("foo "), false);
+        assert_eq!(is_valid_word("foo bar"), false);
+        assert_eq!(is_valid_word("foobar123"), false);
+        assert_eq!(is_valid_word("foo123bar"), false);
+    }
+    #[test]
+    fn test_is_valid_letter() {
+        assert_eq!(is_valid_letter("f"), true);
+        assert_eq!(is_valid_letter("f "), false);
+        assert_eq!(is_valid_letter("@"), false);
+        assert_eq!(is_valid_letter("1"), false);
+        assert_eq!(is_valid_letter("foo"), false);
+    }
+}

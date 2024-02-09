@@ -40,7 +40,7 @@ pub fn clear_screen() {
 
 // Error display function
 pub fn show_error(message: &str) {
-    println!("{}", message);
+    eprintln!("{}", message);
 }
 
 // Loads a string from a file, propagates the error
