@@ -3,7 +3,7 @@ use clap::{ArgGroup,Parser};
 use random_word::Lang;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(about, long_about = None)]
 #[clap(group(
     ArgGroup::new("src")
         .required(false)
