@@ -10,12 +10,13 @@ use random_word::Lang;
         .args(&["word", "file", "random"]),
 ))]
 struct Args {
+    /// File contain words to sample
     #[arg(short, long)]
     file: Option<String>,
-
+    /// Choose a specific word
     #[arg(short, long)]
     word: Option<String>,
-
+    /// Pick a random word
     #[arg(short, long)]
     random: bool
 }
